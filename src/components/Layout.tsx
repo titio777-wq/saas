@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Table, Bot, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Table, Bot, Settings, LogOut, Menu, X, Save } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface LayoutProps {
 
 export function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -86,7 +88,10 @@ export function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
         </nav>
 
         <div className="p-4 border-t border-neutral-800">
-          <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors">
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200 transition-colors"
+          >
             <Settings size={18} />
             Configurações
           </button>
@@ -103,6 +108,85 @@ export function Layout({ children, activeTab, setActiveTab }: LayoutProps) {
           {children}
         </div>
       </main>
+
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col"
+            >
+              <div className="flex justify-between items-center p-6 border-b border-neutral-800">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Settings className="text-emerald-500" />
+                  Configurações do Sistema
+                </h3>
+                <button 
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="text-neutral-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-neutral-800"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-300 mb-1">Moeda Padrão</label>
+                    <select className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                      <option value="BRL">Real Brasileiro (R$)</option>
+                      <option value="USD">Dólar Americano ($)</option>
+                      <option value="EUR">Euro (€)</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-300 mb-1">Fuso Horário</label>
+                    <select className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                      <option value="America/Sao_Paulo">Brasília (BRT/BRST)</option>
+                      <option value="UTC">UTC</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-neutral-800 bg-neutral-950">
+                    <div>
+                      <p className="text-sm font-medium text-white">Modo Escuro</p>
+                      <p className="text-xs text-neutral-500">Ativar tema escuro no sistema</p>
+                    </div>
+                    <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                      <input type="checkbox" name="toggle" id="toggle" checked readOnly className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-emerald-500 appearance-none cursor-pointer right-0" />
+                      <label htmlFor="toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-emerald-500 cursor-pointer"></label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-neutral-800">
+                  <button 
+                    onClick={() => setIsSettingsOpen(false)}
+                    className="px-4 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={() => setIsSettingsOpen(false)}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                  >
+                    <Save size={16} />
+                    Salvar Alterações
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
